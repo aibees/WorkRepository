@@ -22,4 +22,12 @@ public class WorkListService {
             return new WorkListVo();
         }
     }
+
+    public int deleteWorkDataById(String id) {
+        int result = -1;
+
+        System.out.println("Delete service : " + id);
+
+        return result;
+    }
 }

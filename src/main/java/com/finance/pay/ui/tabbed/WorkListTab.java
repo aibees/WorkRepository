@@ -9,6 +9,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -47,6 +49,7 @@ public class WorkListTab extends JPanel {
         this.createLabel("업무기간", 290, 100, 80, 20);
         this.createDateField();
         this.createLabel("반복", 290, 170, 50, 20);
+        this.createRepeatStatus();
     }
 
     /**
@@ -59,38 +62,6 @@ public class WorkListTab extends JPanel {
 
         DefaultListModel<String> listModel = new DefaultListModel<>();
         listModel.addAll(Arrays.asList(test_work));
-        listModel.addElement("NC202211004-testtestestestetsetset");
-        listModel.addElement("NC202211005-testtestestestetsetset");
-        listModel.addElement("NC202211006-testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
-        listModel.addElement("testtestestestetsetset");
         workdata.setModel(listModel);
         workdata.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -172,6 +143,14 @@ public class WorkListTab extends JPanel {
         this.add(toDate);
     }
 
+    /**
+     * 반복여부
+     */
+    private void createRepeatStatus() {
+        String[] radio_name = {"0.반복 없음", "1.주", "2.월", "3.년", "4.비규칙적"};
+
+    }
+
     //////////// right ////////////
     private void paintRightSize() {
         this.createLabel("업무세부내용", 650, 30, 100, 20);
@@ -202,9 +181,13 @@ public class WorkListTab extends JPanel {
         JButton createWorkBtn = new JButton("생성");
         createWorkBtn.setBounds(850, 15, 60, 30);
         createWorkBtn.setForeground(Color.WHITE);
-        createWorkBtn.setBackground(Color.darkGray);
+        createWorkBtn.setBackground(new Color(45, 180, 0));
         createWorkBtn.setBorder(BlackLineBorder);
         createWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+
+        createWorkBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "test!");
+        });
 
         this.add(createWorkBtn);
     }
@@ -213,33 +196,57 @@ public class WorkListTab extends JPanel {
      * 업무 수정버튼
      */
     private void updateNewWorkButton() {
-        JButton createWorkBtn = new JButton("수정");
-        createWorkBtn.setBounds(920, 15, 60, 30);
-        createWorkBtn.setForeground(Color.WHITE);
-        createWorkBtn.setBackground(Color.darkGray);
-        createWorkBtn.setBorder(BlackLineBorder);
-        createWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        JButton updateWorkBtn = new JButton("수정");
+        updateWorkBtn.setBounds(920, 15, 60, 30);
+        updateWorkBtn.setForeground(Color.WHITE);
+        updateWorkBtn.setBackground(Color.darkGray);
+        updateWorkBtn.setBorder(BlackLineBorder);
+        updateWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
 
-        this.add(createWorkBtn);
+        updateWorkBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, "변경사항 저장 ㄱ?");
+            // 0 : Yes, 1 : No, 2 : Cancel
+            if(confirm == 0 && !workcd.isEmpty()) {
+                System.out.println("confirm : " + confirm + ", workId : " + workcd);
+                workListService.deleteWorkDataById(workcd);
+                this.update();
+            }
+        });
+
+        this.add(updateWorkBtn);
     }
 
     /**
      * 업무 삭제버튼
      */
     private void deleteNewWorkButton() {
-        JButton createWorkBtn = new JButton("삭제");
-        createWorkBtn.setBounds(990, 15, 60, 30);
-        createWorkBtn.setForeground(Color.WHITE);
-        createWorkBtn.setBackground(Color.darkGray);
-        createWorkBtn.setBorder(BlackLineBorder);
-        createWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        JButton deleteWorkBtn = new JButton("삭제");
+        deleteWorkBtn.setBounds(990, 15, 60, 30);
+        deleteWorkBtn.setForeground(Color.WHITE);
+        deleteWorkBtn.setBackground(Color.darkGray);
+        deleteWorkBtn.setBorder(BlackLineBorder);
+        deleteWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
 
-        this.add(createWorkBtn);
+        deleteWorkBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, "정말 삭제 ㄱ?");
+            // 0 : Yes, 1 : No, 2 : Cancel
+            if(confirm == 0 && !workcd.isEmpty()) {
+                System.out.println("confirm : " + confirm + ", workId : " + workcd);
+                workListService.deleteWorkDataById(workcd);
+                this.update();
+            }
+        });
+
+        this.add(deleteWorkBtn);
     }
 
     /**********************
      ****    공통함수    ****
      **********************/
+
+    private void update() {
+        this.workcd = "";
+    }
 
     private void createLabel(String text, int x, int y, int w, int h) {
         JLabel label = new JLabel(text);
