@@ -1,4 +1,4 @@
-package com.finance.vo;
+package com.finance.pay.vo;
 
 public class WorkMilestoneVo {
 

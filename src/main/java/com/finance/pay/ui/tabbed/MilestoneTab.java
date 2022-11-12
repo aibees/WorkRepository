@@ -3,7 +3,7 @@ package com.finance.pay.ui.tabbed;
 import com.finance.pay.service.WorkMilestoneService;
 import com.finance.pay.ui.custom.ColumnGroup;
 import com.finance.pay.ui.custom.GroupableTableHeader;
-import com.finance.vo.WorkMilestoneVo;
+import com.finance.pay.vo.WorkMilestoneVo;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -11,8 +11,8 @@ import java.awt.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class MilestoneTab extends JPanel {
 

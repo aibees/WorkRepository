@@ -1,6 +1,6 @@
 package com.finance.pay.service;
 
-import com.finance.vo.WorkMilestoneVo;
+import com.finance.pay.vo.WorkMilestoneVo;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

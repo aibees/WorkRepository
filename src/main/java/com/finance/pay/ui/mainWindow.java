@@ -1,10 +1,14 @@
 package com.finance.pay.ui;
 
+import com.finance.pay.ui.common.CommonComponents;
 import com.finance.pay.ui.tabbed.MilestoneTab;
+import com.finance.pay.ui.tabbed.QuerySaveTab;
+import com.finance.pay.ui.tabbed.SettingTab;
 import com.finance.pay.ui.tabbed.WorkListTab;
 
 import java.awt.EventQueue;
 
+import javax.management.Query;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
@@ -30,6 +34,8 @@ public class mainWindow {
 	private JFrame frame;
 	private JTable table;
 	private JTextField textField;
+
+	private final CommonComponents common = new CommonComponents();
 
 	/**
 	 * Create the application.
@@ -63,16 +69,15 @@ public class mainWindow {
 		tabbedPane.addTab("업무리스트", null, workList, null);
 
 		JPanel milestone = new MilestoneTab();
-		tabbedPane.addTab("일정그래프", null, milestone, null);
+		tabbedPane.addTab("마일스톤", null, milestone, null);
 
-		JLabel footer = new JLabel("NAVER CLOUD / Finance Dev1 / 박준서");
-		footer.setHorizontalAlignment(SwingConstants.CENTER);
-		footer.setFont(new Font("Malgun Gothic", Font.BOLD, 20));
-		footer.setOpaque(true);
-		footer.setForeground(Color.WHITE);
-		footer.setBackground(new Color(45, 180, 0));
-		frame.getContentPane().add(footer, BorderLayout.SOUTH);
+		JPanel querySave = new QuerySaveTab();
+		tabbedPane.addTab("쿼리저장소", null, querySave, "업무 별 쿼리저장");
 
+		JPanel setting = new SettingTab();
+		tabbedPane.addTab("설정", null, setting, "");
+
+		frame.getContentPane().add(common.createFooter("NAVER CLOUD / Finance Dev1 / 박준서"), BorderLayout.SOUTH);
 		frame.setResizable(false);
 
 //		JPanel idSearch = new JPanel();
