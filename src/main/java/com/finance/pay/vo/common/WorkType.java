@@ -1,5 +1,7 @@
 package com.finance.pay.vo.common;
 
+import java.util.Objects;
+
 public class WorkType {
 
     public WorkType() {
@@ -32,5 +34,19 @@ public class WorkType {
     @Override
     public String toString() {
         return this.type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WorkType workType = (WorkType) o;
+        return Objects.equals(number, workType.number) &&
+                Objects.equals(type, workType.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, type);
     }
 }

@@ -6,9 +6,16 @@ public enum SECTION {
     TODATE,
     WORKTYPE,
     REPEAT,
+    REPEATDETAIL,
     STATUS,
     REFER,
     SUBJECTS,
     CYCLE,
-    DESCRIPT
+    DESCRIPT,
+
+    // query save tab
+    QUERYTITLE,
+    QUERYPAGE,
+    QUERYDESC,
+    QUERYTAG
 }

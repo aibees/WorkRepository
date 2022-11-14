@@ -1,5 +1,7 @@
 package com.finance.pay.vo.common;
 
+import java.util.Objects;
+
 public class RepeatStatus {
 
     public RepeatStatus() {
@@ -32,5 +34,19 @@ public class RepeatStatus {
     @Override
     public String toString() {
         return status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RepeatStatus that = (RepeatStatus) o;
+        return Objects.equals(number, that.number) &&
+                Objects.equals(status, that.status);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, status);
     }
 }

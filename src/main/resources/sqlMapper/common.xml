@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common">
+    <select id="getRepeatStatusList" resultType="com.finance.pay.vo.common.RepeatStatus">
+        select number as NUMBER,
+               status as STATUS
+          from common_repeatstatus
+    </select>
+
+    <select id="getRepeatStatusById" resultType="com.finance.pay.vo.common.RepeatStatus">
+        select number as NUMBER,
+               status as STATUS
+          from common_repeatstatus
+         where number = #{id}
+    </select>
+
+    <select id="getWorkTypeList" resultType="com.finance.pay.vo.common.WorkType">
+        select number    as NUMBER,
+               component as TYPE
+          from common_worktype
+    </select>
+
+    <select id="getWorkTypeById" resultType="com.finance.pay.vo.common.WorkType">
+        select number    as NUMBER,
+               component as TYPE
+          from common_worktype
+         where number = #{id}
+    </select>
+
+    <select id="getWorkStatusList" resultType="com.finance.pay.vo.common.WorkStatus">
+        select number    as NUMBER,
+               component as STATUS
+        from common_workstatus
+    </select>
+
+    <select id="getWorkStatusById" resultType="com.finance.pay.vo.common.WorkStatus">
+        select number    as NUMBER,
+               component as STATUS
+          from common_workstatus
+         where number = #{id}
+    </select>
+</mapper>

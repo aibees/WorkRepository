@@ -51,13 +51,13 @@ public class WorkListService {
 
             LocalDate fr = LocalDate.parse("20221121", DateTimeFormatter.ofPattern("yyyyMMdd"));
             LocalDate to = LocalDate.parse("20221210", DateTimeFormatter.ofPattern("yyyyMMdd"));
-            return new WorkListVo("NC202211001", "업무인수인계", fr, to, "00", "0", desc);
+            return new WorkListVo("NC202211001", "업무인수인계", fr, to, "99", "00", "0", "", desc, "Finance Dev1", "");
 
         } else if(id.equals("NC202211002")) {
             String desc = "○ 한자테스트 韓字";
             LocalDate fr = LocalDate.parse("20221130", DateTimeFormatter.ofPattern("yyyyMMdd"));
             LocalDate to = LocalDate.parse("20221225", DateTimeFormatter.ofPattern("yyyyMMdd"));
-            return new WorkListVo("NC202211002", "[개발]채권양도로직 리팩토링", fr, to, "00", "4", desc);
+            return new WorkListVo("NC202211002", "SSL 갱신작업", fr, to, "21", "08", "4", "매주 화요일", desc, "재무팀", "Finance Dev1, 2, Finance Prod1, 2");
         } else {
             return new WorkListVo();
         }

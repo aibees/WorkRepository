@@ -33,7 +33,7 @@ public class MilestoneTab extends JPanel {
     private void createMilestone() {
         this.setLayout(null);
         JScrollPane scroll = new JScrollPane();
-        scroll.setBounds(0, 0, 1080, 600);
+        scroll.setBounds(0, 40, 1080, 600);
         this.add(scroll);
         this.table = this.createGrid();
         scroll.setViewportView(table);

@@ -4,7 +4,9 @@ import com.finance.pay.service.CommonService;
 import com.finance.pay.service.WorkListService;
 import com.finance.pay.vo.common.RepeatStatus;
 import com.finance.pay.vo.WorkListVo;
+import com.finance.pay.vo.common.WorkStatus;
 import com.finance.pay.vo.common.WorkType;
+import com.finance.util.Constant;
 import com.finance.util.MOD;
 import com.finance.util.SECTION;
 
@@ -12,12 +14,14 @@ import javax.swing.*;
 import javax.swing.DefaultListModel;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.text.MaskFormatter;
 import javax.swing.text.TextAction;
 import javax.swing.undo.UndoManager;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -37,23 +41,22 @@ public class WorkListTab extends JPanel {
     private final Map<SECTION, Object> WorkListMapper = new HashMap<>();
 
     private DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy / MM / dd");
-    private final Border BlackLineBorder = new LineBorder(Color.BLACK, 2);
     private String workcd = "";
 
     public WorkListTab() {
-        this.setBackground(Color.WHITE);
+        this.setBackground(Constant.BACKGROUND_COLOR);
         this.createWorkList();
     }
 
     private void createWorkList() {
-        this.setLayout(null); // absolute layout
-        this.setBackground(Color.lightGray);
-        this.paintLeftSize();
-        this.paintRightSize();
-        this.init(MOD.INIT);
-
-        for(SECTION k : this.WorkListMapper.keySet()) {
-            System.out.println(k.toString());
+        try {
+            this.setLayout(null); // absolute layout
+//            this.setBackground(Color.lightGray);
+            this.paintLeftSize();
+            this.paintRightSize();
+            this.init(MOD.INIT);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -62,35 +65,49 @@ public class WorkListTab extends JPanel {
             // title
             ((JTextField)this.WorkListMapper.get(TITLE)).setText("");
             ((JTextField)this.WorkListMapper.get(TITLE)).setEditable(false);
-            ((JTextField)this.WorkListMapper.get(TITLE)).setBackground(new Color(205, 205, 205));
+            ((JTextField)this.WorkListMapper.get(TITLE)).setBackground(Constant.DISABLED_COLOR);
 
             // date
             ((JFormattedTextField)this.WorkListMapper.get(FRDATE)).setValue(null);
             ((JFormattedTextField)this.WorkListMapper.get(FRDATE)).setEditable(false);
-            ((JFormattedTextField)this.WorkListMapper.get(FRDATE)).setBackground(new Color(205, 205, 205));
+            ((JFormattedTextField)this.WorkListMapper.get(FRDATE)).setBackground(Constant.DISABLED_COLOR);
 
             ((JFormattedTextField)this.WorkListMapper.get(TODATE)).setValue(null);
             ((JFormattedTextField)this.WorkListMapper.get(TODATE)).setEditable(false);
-            ((JFormattedTextField)this.WorkListMapper.get(TODATE)).setBackground(new Color(205, 205, 205));
+            ((JFormattedTextField)this.WorkListMapper.get(TODATE)).setBackground(Constant.DISABLED_COLOR);
 
             // WORKTYPE
             ((JComboBox)this.WorkListMapper.get(WORKTYPE)).setEnabled(false);
+            ((JComboBox)this.WorkListMapper.get(WORKTYPE)).setSelectedIndex(0);
             ((JComboBox)this.WorkListMapper.get(WORKTYPE)).setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public void paint(Graphics g) {
                     setForeground(Color.BLACK);
-                    setBackground(new Color(205, 205, 205));
+                    setBackground(Constant.DISABLED_COLOR);
                     super.paint(g);
                 }
             });
 
             // repeat
             ((JComboBox)this.WorkListMapper.get(REPEAT)).setEnabled(false);
+            ((JComboBox)this.WorkListMapper.get(REPEAT)).setSelectedIndex(0);
             ((JComboBox)this.WorkListMapper.get(REPEAT)).setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public void paint(Graphics g) {
                     setForeground(Color.BLACK);
-                    setBackground(new Color(205, 205, 205));
+                    setBackground(Constant.DISABLED_COLOR);
+                    super.paint(g);
+                }
+            });
+
+            // STATUS
+            ((JComboBox)this.WorkListMapper.get(STATUS)).setEnabled(false);
+            ((JComboBox)this.WorkListMapper.get(STATUS)).setSelectedIndex(0);
+            ((JComboBox)this.WorkListMapper.get(STATUS)).setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public void paint(Graphics g) {
+                    setForeground(Color.BLACK);
+                    setBackground(Constant.DISABLED_COLOR);
                     super.paint(g);
                 }
             });
@@ -98,12 +115,12 @@ public class WorkListTab extends JPanel {
             // SUBJECTS
             ((JTextField)this.WorkListMapper.get(SUBJECTS)).setText("");
             ((JTextField)this.WorkListMapper.get(SUBJECTS)).setEditable(false);
-            ((JTextField)this.WorkListMapper.get(SUBJECTS)).setBackground(new Color(205, 205, 205));
+            ((JTextField)this.WorkListMapper.get(SUBJECTS)).setBackground(Constant.DISABLED_COLOR);
 
             // REFER
             ((JTextField)this.WorkListMapper.get(REFER)).setText("");
             ((JTextField)this.WorkListMapper.get(REFER)).setEditable(false);
-            ((JTextField)this.WorkListMapper.get(REFER)).setBackground(new Color(205, 205, 205));
+            ((JTextField)this.WorkListMapper.get(REFER)).setBackground(Constant.DISABLED_COLOR);
 
             // DESCRIPT
             ((JTextArea)this.WorkListMapper.get(DESCRIPT)).setText("");
@@ -127,6 +144,7 @@ public class WorkListTab extends JPanel {
 
             // worktype
             ((JComboBox)this.WorkListMapper.get(WORKTYPE)).setEnabled(true);
+            ((JComboBox)this.WorkListMapper.get(WORKTYPE)).setSelectedIndex(0);
             ((JComboBox)this.WorkListMapper.get(WORKTYPE)).setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public void paint(Graphics g) {
@@ -138,7 +156,20 @@ public class WorkListTab extends JPanel {
 
             // repeat
             ((JComboBox)this.WorkListMapper.get(REPEAT)).setEnabled(true);
+            ((JComboBox)this.WorkListMapper.get(REPEAT)).setSelectedIndex(0);
             ((JComboBox)this.WorkListMapper.get(REPEAT)).setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public void paint(Graphics g) {
+                    setForeground(Color.BLACK);
+                    setBackground(Color.WHITE);
+                    super.paint(g);
+                }
+            });
+
+            // STATUS
+            ((JComboBox)this.WorkListMapper.get(STATUS)).setEnabled(true);
+            ((JComboBox)this.WorkListMapper.get(STATUS)).setSelectedIndex(0);
+            ((JComboBox)this.WorkListMapper.get(STATUS)).setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public void paint(Graphics g) {
                     setForeground(Color.BLACK);
@@ -211,7 +242,7 @@ public class WorkListTab extends JPanel {
     }
 
     ////////////// left ////////////
-    private void paintLeftSize() {
+    private void paintLeftSize() throws ParseException {
         // 업무리스트
         this.createLabel("업무리스트", 0, 30, 100, 20);
         this.createTitleListView();
@@ -226,7 +257,7 @@ public class WorkListTab extends JPanel {
         this.createWorkType();
         // 반복성
         this.createLabel("반복", 290, 240, 50, 20);
-        this.createLabel("주기", 500, 240, 50, 20);
+        this.createLabel("주기", 400, 240, 50, 20);
         this.createRepeatStatus();
         // 업무상태
         this.createLabel("업무상태", 290, 310, 80, 20);
@@ -234,9 +265,8 @@ public class WorkListTab extends JPanel {
         // 업무관여리스트
         this.createLabel("유관부서", 290, 380, 140, 20);
         this.createRelatedList();
-// 여백
-//        this.createLabel("업무상태", 290, 450, 80, 20);
-//        this.createWorkStatus();
+        // 여백
+
     }
 
     /**
@@ -244,43 +274,76 @@ public class WorkListTab extends JPanel {
      */
     private void createTitleListView() {
         // --test data--
-        String[] test_work = {"NC202211001-업무인수인계", "NC202211002-[반복]SSL 갱신작업", "NC202211003-[개발]채권양수로직 리팩토링"};
+        String[] test_work = {"NC202211001-업무인수인계", "NC202211002-[반복]SSL 갱신작업"};
         JList<String> workdata = new JList<>();
 
         DefaultListModel<String> listModel = new DefaultListModel<>();
         listModel.addAll(Arrays.asList(test_work));
         workdata.setModel(listModel);
         workdata.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        workdata.setFont(Constant.LIST_FONT);
 
         workdata.addListSelectionListener(e -> {
             if(!workcd.equals(workdata.getSelectedValue())) {
-                this.init(MOD.INIT);
-                workcd = workdata.getSelectedValue().split("-")[0];
+                try {
+                    this.init(MOD.INIT);
+                    workcd = workdata.getSelectedValue().split("-")[0];
 
-                WorkListVo work = workListService.getWorkDataById(workcd);
+                    WorkListVo work = workListService.getWorkDataById(workcd);
 
-                // title update
-                JTextField title = (JTextField) this.WorkListMapper.get(TITLE);
-                if(title != null)
-                    title.setText(work.getWorkTitle());
-                else
-                    title.setText(workcd);
+                    /**
+                     * title update
+                     */
+                    JTextField title = (JTextField) this.WorkListMapper.get(TITLE);
+                    if (title != null)
+                        title.setText(work.getWorkTitle());
+                    else
+                        title.setText(workcd);
 
-                // fr & to update
-                JFormattedTextField fr = (JFormattedTextField) this.WorkListMapper.get(FRDATE);
-                if(fr != null)
-                    fr.setValue(Date.from(work.getFrDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                    /**
+                     * fr & to update
+                     */
+                    JFormattedTextField fr = (JFormattedTextField) this.WorkListMapper.get(FRDATE);
+                    if (fr != null) {
+                        fr.setValue(work.getFrDate().atStartOfDay(ZoneId.systemDefault()).format(format));
+                    }
+                    JFormattedTextField to = (JFormattedTextField) this.WorkListMapper.get(TODATE);
+                    if (to != null) {
+                        to.setValue(work.getToDate().atStartOfDay(ZoneId.systemDefault()).format(format));
+                    }
 
-                JFormattedTextField to = (JFormattedTextField) this.WorkListMapper.get(TODATE);
-                if(to != null)
-                    to.setValue(Date.from(work.getToDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                    /**
+                     * worktype update
+                     */
+                    ((JComboBox<WorkType>)this.WorkListMapper.get(WORKTYPE)).setSelectedItem(commonService.getWorktypeById(work.getWorktype()));
 
-                // repeat
-                JComboBox<RepeatStatus> repeat = ((JComboBox<RepeatStatus>)this.WorkListMapper.get(REPEAT));
-                repeat.setSelectedIndex(Integer.parseInt(work.getRepeat()));
+                    /**
+                     * repeatStatus update
+                     */
+                    ((JComboBox<RepeatStatus>)this.WorkListMapper.get(REPEAT)).setSelectedItem(commonService.getRepeatStatusById(work.getRepeat()));
+                    ((JTextField)this.WorkListMapper.get(REPEATDETAIL)).setText(work.getRepeatDetail());
 
-                // description
-                ((JTextArea)this.WorkListMapper.get(DESCRIPT)).setText(work.getDesc());
+                    /**
+                     * workstatus update
+                     */
+                    ((JComboBox<WorkStatus>)this.WorkListMapper.get(STATUS)).setSelectedItem(commonService.getWorkStatusById(work.getWorkstatus()));
+
+                    /**
+                     * subject / cc update
+                     */
+                    ((JTextField)this.WorkListMapper.get(SUBJECTS)).setText(work.getSubject());
+                    ((JTextField)this.WorkListMapper.get(REFER)).setText(work.getCc());
+
+                    /**
+                     * description update
+                     */
+                    ((JTextArea) this.WorkListMapper.get(DESCRIPT)).setText(work.getDesc());
+
+                } catch(NumberFormatException nfe) {
+                    JOptionPane.showMessageDialog(this, "부정합한 데이터가 있는 항목입니다.");
+                } catch(NullPointerException npe) {
+                    JOptionPane.showMessageDialog(this, "필수 데이터가 누락된 항목입니다.");
+                }
             }
         });
         // -------------
@@ -301,8 +364,8 @@ public class WorkListTab extends JPanel {
         titleField.setBounds(290, 50, 300, 40);
         titleField.setForeground(Color.BLACK);
         titleField.setBackground(Color.WHITE);
-        titleField.setBorder(BlackLineBorder);
-        titleField.setFont(new Font("Helvetica", Font.PLAIN, 16));
+        titleField.setBorder(Constant.BlackLineBorder);
+        titleField.setFont(Constant.TEXTFIELD_FONT);
         WorkListMapper.put(TITLE, titleField);
         this.add(titleField);
     }
@@ -310,8 +373,8 @@ public class WorkListTab extends JPanel {
     /**
      * 업무기간 FROM & TO
      */
-    private void createDateField() {
-        SimpleDateFormat form = new SimpleDateFormat("yyyy / MM / dd");
+    private void createDateField() throws ParseException {
+        MaskFormatter form = new MaskFormatter("#### / ## / ##");
         JFormattedTextField frDate = new JFormattedTextField(form);
         JFormattedTextField toDate = new JFormattedTextField(form);
 
@@ -319,8 +382,8 @@ public class WorkListTab extends JPanel {
         frDate.setHorizontalAlignment(SwingConstants.CENTER);
         frDate.setForeground(Color.BLACK);
         frDate.setBackground(Color.WHITE);
-        frDate.setBorder(BlackLineBorder);
-        frDate.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        frDate.setBorder(Constant.BlackLineBorder);
+        frDate.setFont(Constant.TEXTFIELD_FONT);
 
         this.createLabel(" ~ ", 430, 125, 40, 30);
 
@@ -328,8 +391,8 @@ public class WorkListTab extends JPanel {
         toDate.setHorizontalAlignment(SwingConstants.CENTER);
         toDate.setForeground(Color.BLACK);
         toDate.setBackground(Color.WHITE);
-        toDate.setBorder(BlackLineBorder);
-        toDate.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        toDate.setBorder(Constant.BlackLineBorder);
+        toDate.setFont(Constant.TEXTFIELD_FONT);
 
         WorkListMapper.put(FRDATE, frDate);
         this.add(frDate);
@@ -343,16 +406,14 @@ public class WorkListTab extends JPanel {
     private void createWorkType() {
         JComboBox<WorkType> typeBox = new JComboBox<WorkType>();
         typeBox.setBounds(290, 190, 300, 40);
-        typeBox.setBorder(BlackLineBorder);
-        typeBox.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        typeBox.setBorder(Constant.BlackLineBorder);
+        typeBox.setFont(Constant.TEXTFIELD_FONT);
 
         WorkType[] types = commonService.getWorktypeComboList();
         ComboBoxModel<WorkType> comboModel = new DefaultComboBoxModel<>(types);
 
         typeBox.setModel(comboModel);
-
         this.WorkListMapper.put(WORKTYPE, typeBox);
-
         this.add(typeBox);
     }
 
@@ -361,9 +422,9 @@ public class WorkListTab extends JPanel {
      */
     private void createRepeatStatus() {
         JComboBox<RepeatStatus> repeatBox = new JComboBox<>();
-        repeatBox.setBounds(290, 260, 200, 40);
-        repeatBox.setBorder(BlackLineBorder);
-        repeatBox.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        repeatBox.setBounds(290, 260, 100, 40);
+        repeatBox.setBorder(Constant.BlackLineBorder);
+        repeatBox.setFont(Constant.TEXTFIELD_FONT);
 
         RepeatStatus[] statuses = commonService.getRepeatComboList();
         ComboBoxModel<RepeatStatus> comboModel = new DefaultComboBoxModel<>(statuses);
@@ -374,31 +435,27 @@ public class WorkListTab extends JPanel {
         this.add(repeatBox);
 
         // 반복일 시 주기 입력
-        JComboBox<RepeatStatus> cycleBox = new JComboBox<>();
-        cycleBox.setBounds(500, 260, 90, 40);
-        cycleBox.setBorder(BlackLineBorder);
-        cycleBox.setFont(new Font("맑은 고딕", Font.BOLD, 14));
-
-        RepeatStatus[] statuses_ex = commonService.getRepeatComboList();
-        ComboBoxModel<RepeatStatus> comboModel_ex = new DefaultComboBoxModel<>(statuses_ex);
-
-        cycleBox.setModel(comboModel_ex);
-
-        this.WorkListMapper.put(CYCLE, cycleBox);
-        this.add(cycleBox);
+        JTextField repeatDetail = new JTextField();
+        repeatDetail.setBounds(400, 260, 190, 40);
+        repeatDetail.setForeground(Color.BLACK);
+        repeatDetail.setBackground(Color.WHITE);
+        repeatDetail.setBorder(Constant.BlackLineBorder);
+        repeatDetail.setFont(Constant.TEXTFIELD_FONT);
+        WorkListMapper.put(REPEATDETAIL, repeatDetail);
+        this.add(repeatDetail);
     }
 
     /**
      * 업무상태
      */
     private void createWorkStatus() {
-        JComboBox<RepeatStatus> statusBox = new JComboBox<>();
+        JComboBox<WorkStatus> statusBox = new JComboBox<>();
         statusBox.setBounds(290, 330, 300, 40);
-        statusBox.setBorder(BlackLineBorder);
-        statusBox.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        statusBox.setBorder(Constant.BlackLineBorder);
+        statusBox.setFont(Constant.TEXTFIELD_FONT);
 
-        RepeatStatus[] statuses = commonService.getRepeatComboList();
-        ComboBoxModel<RepeatStatus> comboModel = new DefaultComboBoxModel<>(statuses);
+        WorkStatus[] statuses = commonService.getWorkStatusComboList();
+        ComboBoxModel<WorkStatus> comboModel = new DefaultComboBoxModel<>(statuses);
 
         statusBox.setModel(comboModel);
 
@@ -416,8 +473,8 @@ public class WorkListTab extends JPanel {
         subjectList.setBounds(330, 400, 260, 40);
         subjectList.setForeground(Color.BLACK);
         subjectList.setBackground(Color.WHITE);
-        subjectList.setBorder(BlackLineBorder);
-        subjectList.setFont(new Font("Helvetica", Font.PLAIN, 16));
+        subjectList.setBorder(Constant.BlackLineBorder);
+        subjectList.setFont(Constant.TEXTFIELD_FONT);
         WorkListMapper.put(SUBJECTS, subjectList);
         this.add(subjectList);
 
@@ -427,8 +484,8 @@ public class WorkListTab extends JPanel {
         refList.setBounds(330, 440, 260, 40);
         refList.setForeground(Color.BLACK);
         refList.setBackground(Color.WHITE);
-        refList.setBorder(BlackLineBorder);
-        refList.setFont(new Font("Helvetica", Font.PLAIN, 16));
+        refList.setBorder(Constant.BlackLineBorder);
+        refList.setFont(Constant.TEXTFIELD_FONT);
         WorkListMapper.put(REFER, refList);
         this.add(refList);
     }
@@ -451,8 +508,8 @@ public class WorkListTab extends JPanel {
      */
     private void createDescription() {
         JTextArea desc = new JTextArea();
-        desc.setBorder(BlackLineBorder);
-        desc.setFont(new Font("Helvetica", Font.PLAIN, 13));
+        desc.setBorder(Constant.BlackLineBorder);
+        desc.setFont(Constant.DESC_FONT);
         desc.setLineWrap(true);
         JScrollPane descPane = new JScrollPane(desc);
         descPane.setBounds(640, 50, 410, 520);
@@ -490,8 +547,8 @@ public class WorkListTab extends JPanel {
         createWorkBtn.setBounds(780, 15, 60, 30);
         createWorkBtn.setForeground(Color.WHITE);
         createWorkBtn.setBackground(new Color(45, 180, 0));
-        createWorkBtn.setBorder(BlackLineBorder);
-        createWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        createWorkBtn.setBorder(Constant.BlackLineBorder);
+        createWorkBtn.setFont(Constant.BUTTON_FONT);
 
         createWorkBtn.addActionListener(e -> {
             this.init(MOD.NEW);
@@ -508,8 +565,8 @@ public class WorkListTab extends JPanel {
         updateWorkBtn.setBounds(850, 15, 60, 30);
         updateWorkBtn.setForeground(Color.WHITE);
         updateWorkBtn.setBackground(Color.darkGray);
-        updateWorkBtn.setBorder(BlackLineBorder);
-        updateWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        updateWorkBtn.setBorder(Constant.BlackLineBorder);
+        updateWorkBtn.setFont(Constant.BUTTON_FONT);
 
         updateWorkBtn.addActionListener(e -> {
             if(!workcd.isEmpty())
@@ -527,20 +584,22 @@ public class WorkListTab extends JPanel {
         saveWorkBtn.setBounds(920, 15, 60, 30);
         saveWorkBtn.setForeground(Color.WHITE);
         saveWorkBtn.setBackground(Color.darkGray);
-        saveWorkBtn.setBorder(BlackLineBorder);
-        saveWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        saveWorkBtn.setBorder(Constant.BlackLineBorder);
+        saveWorkBtn.setFont(Constant.BUTTON_FONT);
 
         saveWorkBtn.addActionListener(e -> {
-            WorkListVo saveData = getNewWorkData();
-            System.out.println("saveData : ");
-            System.out.println(saveData);
+            try {
+                WorkListVo saveData = getNewWorkData();
+                System.out.println(saveData);
 
-            int confirm = JOptionPane.showConfirmDialog(this, "Save Process Confirm? workcd : " + ((this.workcd.isEmpty())?"New":this.workcd));
-            // 0 : Yes, 1 : No, 2 : Cancel
-            if(confirm == 0 && !workcd.isEmpty()) {
-                System.out.println("confirm : " + confirm + ", workId : " + workcd);
-                workListService.deleteWorkDataById(workcd);
-                this.update();
+                int confirm = JOptionPane.showConfirmDialog(this, "Save Process Confirm? workcd : " + ((this.workcd.isEmpty()) ? "New" : this.workcd));
+                // 0 : Yes, 1 : No, 2 : Cancel
+                if (confirm == 0 && !workcd.isEmpty()) {
+                    workListService.deleteWorkDataById(workcd);
+                    this.update();
+                }
+            } catch(Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
             }
         });
 
@@ -551,7 +610,7 @@ public class WorkListTab extends JPanel {
         JComboBox<RepeatStatus> repeat = (JComboBox<RepeatStatus>) this.WorkListMapper.get(REPEAT);
         JComboBox<WorkType> types = (JComboBox<WorkType>) this.WorkListMapper.get(WORKTYPE);
 
-        return new WorkListVo.Builder()
+        return WorkListVo.builder()
                 .workId((this.workcd.isEmpty())?(workListService.getNewWorkCode()):(this.workcd))
                 .workTitle(((JTextField)this.WorkListMapper.get(TITLE)).getText())
                 .frDate(LocalDate.parse(((JFormattedTextField)this.WorkListMapper.get(FRDATE)).getText(), this.format))
@@ -559,7 +618,7 @@ public class WorkListTab extends JPanel {
                 .worktype(types.getItemAt(types.getSelectedIndex()).getNumber())
                 .repeat(repeat.getItemAt(repeat.getSelectedIndex()).getNumber())
                 .desc(((JTextArea)this.WorkListMapper.get(DESCRIPT)).getText())
-                .create();
+                .build();
     }
 
     /**
@@ -570,8 +629,8 @@ public class WorkListTab extends JPanel {
         deleteWorkBtn.setBounds(990, 15, 60, 30);
         deleteWorkBtn.setForeground(Color.WHITE);
         deleteWorkBtn.setBackground(Color.darkGray);
-        deleteWorkBtn.setBorder(BlackLineBorder);
-        deleteWorkBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        deleteWorkBtn.setBorder(Constant.BlackLineBorder);
+        deleteWorkBtn.setFont(Constant.BUTTON_FONT);
 
         deleteWorkBtn.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, "정말 삭제 ㄱ?");
@@ -599,7 +658,7 @@ public class WorkListTab extends JPanel {
         label.setLocation(x, y);
         label.setSize(w, h);
         label.setForeground(Color.BLACK);
-        label.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+        label.setFont(Constant.TEXTFIELD_FONT);
         this.add(label);
     }
 }
